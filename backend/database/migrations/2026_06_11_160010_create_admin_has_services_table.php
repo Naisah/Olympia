@@ -1,0 +1,20 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('admin_has_services', function (Blueprint $table) {
+            $table->unsignedBigInteger('admin_id');
+            $table->unsignedBigInteger('services_id');
+            $table->foreign('admin_id')->references('id')->on('admin')->onDelete('cascade');
+            $table->foreign('services_id')->references('id')->on('services')->onDelete('cascade');
+            $table->primary(['admin_id', 'services_id']);
+        });
+    }
+    public function down(): void {
+        Schema::dropIfExists('admin_has_services');
+    }
+};

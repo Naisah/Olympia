@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test ML Server</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .box { border: 1px solid #ccc; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input { margin-bottom: 10px; }
+        button { padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+    <h1>Test the Facial Recognition AI</h1>
+    <p>This is a simple tester page. It sends two images directly to your new Python API to see if it works.</p>
+
+    <div class="box">
+        <h3>Step 1: Test Registration (eKYC)</h3>
+        <form id="ekycForm">
+            <label>Upload an ID picture:</label>
+            <input type="file" id="id_image" accept="image/*" required>
+            
+            <label>Upload a Selfie picture:</label>
+            <input type="file" id="selfie_image" accept="image/*" required>
+            
+            <button type="submit">Compare Faces</button>
+        </form>
+        
+        <h4>API Response:</h4>
+        <pre id="responseBox">Waiting for submission...</pre>
+    </div>
+
+    <script>
+        document.getElementById('ekycForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const responseBox = document.getElementById('responseBox');
+            responseBox.innerText = "Analyzing faces... please wait.";
+
+            const formData = new FormData();
+            formData.append("id_image", document.getElementById("id_image").files[0]);
+            formData.append("selfie_image", document.getElementById("selfie_image").files[0]);
+
+            try {
+                const res = await fetch("http://localhost:8001/api/register_ekyc", {
+                    method: "POST",
+                    body: formData
+                });
+                
+                const data = await res.json();
+                responseBox.innerText = JSON.stringify(data, null, 2);
+            } catch (err) {
+                responseBox.innerText = "Error connecting to the API. Is the server running?\n\n" + err;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+const fs = require('fs');
+const path = require('path');
+
+const srcDir = path.join(__dirname, 'src');
+
+function getAllFiles(dir, fileList = []) {
+  const files = fs.readdirSync(dir);
+  for (const file of files) {
+    const stat = fs.statSync(path.join(dir, file));
+    if (stat.isDirectory()) {
+      getAllFiles(path.join(dir, file), fileList);
+    } else if (file.endsWith('.jsx') || file.endsWith('.js')) {
+      fileList.push(path.join(dir, file));
+    }
+  }
+  return fileList;
+}
+
+const emojiMap = {
+  '📍': '<MapPin size={18} className=\inline-block align-middle\ />',
+  '🕒': '<Clock size={18} className=\inline-block align-middle\ />',
+  '🏀': '<Activity size={24} className=\inline-block align-middle\ />',
+  '📧': '<Mail size={18} className=\inline-block align-middle\ />',
+  '🖨️': '<Printer size={18} className=\inline-block align-middle\ />',
+  '📅': '<Calendar size={18} className=\inline-block align-middle\ />',
+  '🚨': '<AlertTriangle size={24} className=\inline-block align-middle\ />'
+};
+
+const files = getAllFiles(srcDir);
+
+for (let file of files) {
+  let content = fs.readFileSync(file, 'utf8');
+  let originalContent = content;
+  
+  // Remove comments
+  // JSX comments {/* ... */}
+  content = content.replace(/\{\/\*[\s\S]*?\*\/\}/g, '');
+  // Block comments /* ... */
+  content = content.replace(/\/\*[\s\S]*?\*\//g, '');
+  // Single line comments (careful with URLs)
+  content = content.replace(/(?<!https?:|http:)\/\/[^\n]*/g, '');
+
+  let usedIcons = new Set();
+  
+  // Replace emojis
+  for (const [emoji, replacement] of Object.entries(emojiMap)) {
+    if (content.includes(emoji)) {
+      const iconName = replacement.match(/<([A-Z][a-zA-Z]+)/)[1];
+      usedIcons.add(iconName);
+      
+      // Need to handle emojis in JSX text which might need wrapping if they are plain text,
+      // but replacing emoji directly with JSX element like <MapPin /> will break if it's inside a string.
+      // Emojis inside strings like icon: '🏀' need to be handled differently!
+    }
+  }
+
+  if (content !== originalContent) {
+    fs.writeFileSync(file, content, 'utf8');
+  }
+}
+console.log('Done');

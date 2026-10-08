@@ -1,0 +1,45 @@
+@import "tailwindcss";
+@import "./assets/style.css";
+
+@theme {
+  --color-customBlue: #3361B8;
+  --color-customDarkBlue: #26498A;
+  --color-customBlack: #0A0908;
+  --color-customWhite: #FDFFFC;
+  --color-customYellow: #FFD700;
+  --font-sans: "Inter", sans-serif;
+}
+
+body {
+  @apply bg-gray-50 font-sans text-customBlack min-h-screen flex flex-col;
+}
+
+#root {
+  @apply min-h-screen flex flex-col w-full;
+}
+
+/* Accessibility: High Contrast Mode */
+.high-contrast-mode {
+  background-color: #000000 !important;
+  color: #FFFF00 !important;
+}
+
+.high-contrast-mode * {
+  background-color: #000000 !important;
+  color: #FFFF00 !important;
+  border-color: #FFFF00 !important;
+}
+
+.high-contrast-mode a,
+.high-contrast-mode button {
+  text-decoration: underline !important;
+  font-weight: bold !important;
+}
+
+/* Protect media elements from being overwritten */
+.high-contrast-mode img,
+.high-contrast-mode video,
+.high-contrast-mode canvas {
+  background-color: transparent !important;
+  border: none !important;
+}
